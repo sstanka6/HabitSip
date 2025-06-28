@@ -4,7 +4,7 @@ import { usePalette } from '../contexts/ThemeContext';
 
 interface Props {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
 }
 
 export default function Card({ children, style }: Props) {

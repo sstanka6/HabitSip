@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import Card from '../components/Card';
+import { spacing } from '../styles/spacing';
+import { typography } from '../styles/typography';
 import dayjs from 'dayjs';
 import { getLogs, DrinkLog } from '../utils/logs';
 import { getNumber } from '../utils/storage';
@@ -13,9 +18,13 @@ interface Stats {
   moneySaved: number;
 }
 
+
+
 export default function DashboardScreen() {
   const [stats, setStats] = useState<Stats | null>(null);
+
   const palette = usePalette();
+  
 
   const computeStats = async () => {
     const logs = await getLogs();
@@ -77,47 +86,61 @@ export default function DashboardScreen() {
     return () => clearInterval(unsub);
   }, []);
 
+
+
   if (!stats) {
     return (
-      <View style={[styles.container, { backgroundColor: palette.background }]}>
-        <Text style={styles.title}>Loading...</Text>
-      </View>
+      <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
+        <ScrollView>
+          <Text style={styles.title}>Loading...</Text>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: palette.background }]}>
-      <Text style={[styles.header, { color: palette.text }]}>Current streak</Text>
-      <Text style={[styles.metric, { color: palette.text }]}>{stats.currentStreak} days</Text>
-
-      <Text style={[styles.header, { color: palette.text }]}>Best streak</Text>
-      <Text style={[styles.metric, { color: palette.text }]}>{stats.bestStreak} days</Text>
-
-      <Text style={[styles.header, { color: palette.text }]}>Clean days this month</Text>
-      <Text style={[styles.metric, { color: palette.text }]}>{stats.cleanThisMonth}</Text>
-
-      <Text style={[styles.header, { color: palette.text }]}>Total drinks this week</Text>
-      <Text style={[styles.metric, { color: palette.text }]}>{stats.drinksThisWeek}</Text>
-
-      <Text style={[styles.header, { color: palette.text }]}>Money saved</Text>
-      <Text style={[styles.metric, { color: palette.text }]}>${stats.moneySaved.toFixed(2)}</Text>
-    </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
+      <ScrollView>
+        <View style={styles.grid}>
+          <Card style={styles.card}>
+            <Text style={[typography.caption, { color: palette.text }]}>Current streak</Text>
+            <Text style={[typography.h2, { color: palette.text }]}>{stats.currentStreak} days</Text>
+          </Card>
+          <Card style={styles.card}>
+            <Text style={[typography.caption, { color: palette.text }]}>Best streak</Text>
+            <Text style={[typography.h2, { color: palette.text }]}>{stats.bestStreak} days</Text>
+          </Card>
+          <Card style={styles.card}>
+            <Text style={[typography.caption, { color: palette.text }]}>Clean days this month</Text>
+            <Text style={[typography.h2, { color: palette.text }]}>{stats.cleanThisMonth}</Text>
+          </Card>
+          <Card style={styles.card}>
+            <Text style={[typography.caption, { color: palette.text }]}>Drinks this week</Text>
+            <Text style={[typography.h2, { color: palette.text }]}>{stats.drinksThisWeek}</Text>
+          </Card>
+          <Card style={[styles.card, { flexBasis: '100%' }]}>
+            <Text style={[typography.caption, { color: palette.text }]}>Money saved</Text>
+            <Text style={[typography.h2, { color: palette.text }]}>${stats.moneySaved.toFixed(2)}</Text>
+          </Card>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    alignItems: 'center',
+    padding: spacing(4),
   },
-  header: {
-    fontSize: 18,
-    marginTop: 20,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  metric: {
-    fontSize: 32,
-    fontWeight: '700',
+  card: {
+    flexBasis: '48%',
+    marginBottom: spacing(4),
   },
   title: { fontSize: 20 },
 });
