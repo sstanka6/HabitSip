@@ -3,9 +3,10 @@ import dayjs from 'dayjs';
 
 export interface DrinkLog {
   date: string; // YYYY-MM-DD
-  drinks: number; // 0 for clean day
-  type: string; // beer/wine/spirits/custom/clean
+  drinks: number; // total drinks, 0 for clean day
+  type: string; // general category or 'mixed'/'clean'
   note?: string;
+  breakdown?: Record<string, number>; // per-category counts, e.g. { beer:2, wine:1 }
 }
 
 const KEY = 'drinkLogs';
@@ -31,6 +32,14 @@ export async function deleteLog(date: string) {
   const logs = await getLogs();
   const updated = logs.filter(l => l.date !== date);
   await AsyncStorage.setItem(KEY, JSON.stringify(updated));
+}
+
+export async function clearLogs() {
+  try {
+    await AsyncStorage.removeItem(KEY);
+  } catch (e) {
+    console.warn('clearLogs error', e);
+  }
 }
 
 export async function getLogForDate(date: string): Promise<DrinkLog | undefined> {

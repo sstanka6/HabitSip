@@ -1,0 +1,6 @@
+[build]
+  command = "expo export --platform web --output-dir dist"
+  publish = "dist"
+
+[context.production]
+  environment = { NODE_OPTIONS = "--max_old_space_size=4096" }
