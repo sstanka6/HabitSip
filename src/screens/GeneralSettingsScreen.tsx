@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OptionButton from '../components/OptionButton';
@@ -17,6 +18,8 @@ import { getString, getNumber, getBoolean, saveString, saveNumber, saveBoolean }
 import { updateDailyReminder } from '../utils/notifications';
 import { exportLogsCsv } from '../utils/exportCsv';
 import { clearLogs } from '../utils/logs';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 import { usePalette } from '../contexts/ThemeContext';
 
 export default function GeneralSettingsScreen() {
@@ -27,6 +30,7 @@ export default function GeneralSettingsScreen() {
   const [status, setStatus] = useState<string | null>(null);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [reminderTime, setReminderTime] = useState('20:00');
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const palette = usePalette();
 
   const load = async () => {
@@ -118,14 +122,31 @@ export default function GeneralSettingsScreen() {
             <Text style={[styles.header, { color: palette.text }]}>Daily check-in reminder</Text>
             <Switch value={reminder} onValueChange={setReminder} />
 
-            <Text style={[styles.label, { color: palette.text, marginTop: 12 }]}>Reminder time (HH:MM)</Text>
-            <TextInput
-              style={[styles.input, { borderColor: palette.border, backgroundColor: palette.card, color: palette.text }]}
-              value={reminderTime}
-              onChangeText={setReminderTime}
-              placeholder="20:00"
-              placeholderTextColor={palette.border}
-            />
+            <View style={{ marginTop: 24 }}>
+            <Text style={[styles.header, { color: palette.text }]}>Reminder time</Text>
+            <TouchableOpacity
+              style={[styles.input, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderColor: palette.border, backgroundColor: palette.card }]}
+              onPress={() => setShowTimePicker(true)}
+            >
+              <Text style={{ color: palette.text, fontSize: 16 }}>{reminderTime}</Text>
+              <Ionicons name="time" size={20} color={palette.text} />
+            </TouchableOpacity>
+            {showTimePicker && (
+              <DateTimePicker
+                value={(() => { const [h,m] = reminderTime.split(':').map(Number); return new Date(1970,0,1,h,m); })()}
+                mode="time"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={(event: DateTimePickerEvent, date?: Date) => {
+                  if (Platform.OS === 'android') setShowTimePicker(false);
+                  if (date) {
+                    const h = date.getHours();
+                    const m = date.getMinutes();
+                    setReminderTime(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+                  }
+                }}
+              />
+            )}
+          </View>
           </View>
 
           <PrimaryButton title="Save" onPress={handleSave} style={{ marginTop: 32 }} />
