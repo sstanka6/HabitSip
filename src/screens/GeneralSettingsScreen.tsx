@@ -10,6 +10,7 @@ import {
   Platform,
   Alert,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OptionButton from '../components/OptionButton';
@@ -131,23 +132,31 @@ export default function GeneralSettingsScreen() {
               <Text style={{ color: palette.text, fontSize: 16 }}>{reminderTime}</Text>
               <Ionicons name="time" size={20} color={palette.text} />
             </TouchableOpacity>
-            {showTimePicker && (
-              <DateTimePicker
-                value={(() => { const [h,m] = reminderTime.split(':').map(Number); return new Date(1970,0,1,h,m); })()}
-                mode="time"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(event: DateTimePickerEvent, date?: Date) => {
-                  if (Platform.OS === 'android') setShowTimePicker(false);
-                  if (date) {
-                    const h = date.getHours();
-                    const m = date.getMinutes();
-                    setReminderTime(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
-                  }
-                }}
-              />
-            )}
           </View>
           </View>
+
+{showTimePicker && (
+            <Modal transparent animationType="slide" visible={showTimePicker} onRequestClose={() => setShowTimePicker(false)}>
+              <View style={styles.modalCenter}>
+                <View style={[styles.pickerCard, { backgroundColor: palette.card }]}>
+                  <DateTimePicker
+                    value={(() => { const [h,m] = reminderTime.split(':').map(Number); return new Date(1970,0,1,h,m); })()}
+                    mode="time"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event: DateTimePickerEvent, date?: Date) => {
+                      if (date) {
+                        const h = date.getHours();
+                        const m = date.getMinutes();
+                        setReminderTime(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+                      }
+                    }}
+                    style={{ backgroundColor: 'transparent' }}
+                  />
+                  <PrimaryButton title="Done" onPress={() => setShowTimePicker(false)} fullWidth style={{ marginTop: 12 }} />
+                </View>
+              </View>
+            </Modal>
+          )}
 
           <PrimaryButton title="Save" onPress={handleSave} style={{ marginTop: 32 }} />
           {status && <Text style={[styles.status, { color: palette.success }]}>{status}</Text>}
@@ -219,4 +228,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 12,
   },
+  modalCenter: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
+  pickerCard: { padding: 16, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
 });

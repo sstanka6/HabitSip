@@ -27,6 +27,9 @@ export default function SettingsHomeScreen({ navigation }: SettingsHomeProps) {
         <Text style={[styles.sectionTitle, { color: palette.text }]}>App</Text>
         <SettingsItem label="General" onPress={() => navigation.navigate('GeneralSettings')} />
         <SettingsItem label="Theme" onPress={() => navigation.navigate('ThemeSettings')} />
+        <SettingsItem label="Reminder" onPress={() => navigation.navigate('ReminderSettings')} />
+        <SettingsItem label="Export data" onPress={() => navigation.navigate('ExportData')} />
+        <SettingsItem label="Clear data" onPress={() => navigation.navigate('ClearData')} />
         <SettingsItem label="Achievements" onPress={() => navigation.navigate('Achievements')} />
         <SettingsItem label="Show onboarding again" onPress={handleRedoOnboarding} />
       </ScrollView>
